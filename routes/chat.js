@@ -1,6 +1,9 @@
+import express from 'express';
 import { getWeather } from '../functions/getWeather.js';
 
-router.post('/v1/chat/completions', async (req, res) => {
+const router = express.Router();
+
+router.post('/chat/completions', async (req, res) => {
     try {
         const { messages } = req.body;
 
@@ -8,11 +11,10 @@ router.post('/v1/chat/completions', async (req, res) => {
             return res.status(400).json({ error: 'Meldinger mangler eller er i feil format.' });
         }
 
-        // Send forespørsel til OpenAI for analyse
         const openaiResult = await openai.createChatCompletion({
             model: 'gpt-4',
             messages: messages,
-            function_call: 'auto', // Automatisk funksjonskall
+            function_call: 'auto',
             functions: [
                 {
                     name: 'getWeather',
@@ -31,28 +33,23 @@ router.post('/v1/chat/completions', async (req, res) => {
             ],
         });
 
-        // Sjekk om OpenAI foreslår et funksjonskall
         const functionCall = openaiResult.choices[0]?.message?.function_call;
+
         if (functionCall) {
             const { name, arguments: args } = functionCall;
-
-            // Håndter kun getWeather-funksjonskall
             if (name === 'getWeather') {
                 const location = JSON.parse(args).location;
                 const weatherInfo = await getWeather(location);
 
-                return res.json({
-                    response: weatherInfo,
-                });
+                return res.json({ response: weatherInfo });
             }
         }
 
-        // Hvis ingen funksjonskall ble foreslått, returner OpenAI-svaret
-        return res.json({
-            response: openaiResult.choices[0]?.message?.content,
-        });
+        return res.json({ response: openaiResult.choices[0]?.message?.content });
     } catch (error) {
-        console.error('Feil i /v1/chat/completions:', error);
+        console.error('Feil i /chat/completions:', error);
         res.status(500).json({ error: 'Noe gikk galt under behandling av forespørselen.' });
     }
 });
+
+export default router; // Default export av router
