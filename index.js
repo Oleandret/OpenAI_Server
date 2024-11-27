@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import chatRoutes from './routes/chat.js';
+import chatRoutes from './routes/chat.js'; // Default import
 
 dotenv.config();
 
@@ -17,8 +17,8 @@ app.get('/', (req, res) => {
     res.json({ status: 'Server is running' });
 });
 
-// Ruter
-app.use(chatRoutes);
+// Bruk rutene fra chat.js
+app.use('/v1', chatRoutes);
 
 // Start serveren
 app.listen(port, () => {
