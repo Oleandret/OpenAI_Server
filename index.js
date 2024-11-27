@@ -12,6 +12,11 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Helsesjekk for rotendepunktet
+app.get('/', (req, res) => {
+    res.json({ status: 'Server is running' });
+});
+
 // Ruter
 app.use(chatRoutes);
 
