@@ -1,7 +1,14 @@
 import express from 'express';
 import { getWeather } from '../functions/getWeather.js';
+import { Configuration, OpenAIApi } from 'openai';
 
 const router = express.Router();
+
+// Initialiser OpenAI-klienten
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY, // Miljøvariabel
+});
+const openai = new OpenAIApi(configuration);
 
 router.post('/chat/completions', async (req, res) => {
     try {
