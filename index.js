@@ -8,11 +8,15 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware for API-nøkkelvalidering
+// Middleware for API-nøkkelvalidering med logging
 app.use((req, res, next) => {
     const apiKey = req.headers.authorization?.split(" ")[1]; // Forventet format: "Bearer <API_KEY>"
     
+    console.log("Mottatt API-nøkkel:", apiKey); // Logg API-nøkkel fra forespørselen
+    console.log("Forventet API-nøkkel:", process.env.API_KEY); // Logg forventet API-nøkkel
+    
     if (!apiKey || apiKey !== process.env.API_KEY) {
+        console.error("Feil API-nøkkel eller nøkkel mangler!");
         return res.status(403).json({ error: "Unauthorized - API key is missing or invalid" });
     }
     
