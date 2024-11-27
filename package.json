@@ -12,7 +12,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "node-fetch": "^3.3.1"
+    "node-fetch": "^3.3.1",
+    "openai": "^3.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
@@ -21,6 +22,6 @@
     "node": ">=16.0.0"
   },
   "keywords": ["openai", "express", "api", "functions"],
-  "author": "Ditt navn",
+  "author": "Ole Andre Torjussen",
   "license": "MIT"
 }
