@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export async function getWeather(location) {
     const url = `https://courageous-quietude-production.up.railway.app/api/weather?location=${encodeURIComponent(location)}`;
 
@@ -21,10 +23,10 @@ export async function getWeather(location) {
 
             const readableCondition = conditionMap[data.condition] || data.condition;
 
-            // Fallback til "Ikke oppgitt" hvis data mangler
-            const windSpeed = data.wind_speed ?? "Ikke oppgitt";
-            const windDirection = data.wind_direction ?? "Ikke oppgitt";
-            const humidity = data.humidity ?? "Ikke oppgitt";
+            // Hent detaljer fra "details"-objektet
+            const windSpeed = data.details?.wind_speed ?? "Ikke oppgitt";
+            const windDirection = data.details?.wind_direction ?? "Ikke oppgitt";
+            const humidity = data.details?.humidity ?? "Ikke oppgitt";
 
             return `Været i ${data.location}: ${readableCondition}, temperatur: ${data.temperature}${data.unit}. Vind: ${windSpeed} m/s fra ${windDirection}. Fuktighet: ${humidity}%.`;
         } else {
