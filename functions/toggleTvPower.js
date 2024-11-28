@@ -10,8 +10,8 @@ export const toggleTV = async (action) => {
         throw new Error("Homey API-nøkkel mangler.");
     }
 
-    // URL til Homey API for TV-en
-    const url = `https://api.homey.app/manager/devices/device/6d9c2cd1f6a1ad8d0cc6d8d-1690946168744/capability/onoff`;
+    // URL til Homey API for TV-en med riktig device ID
+    const url = `https://api.homey.app/manager/devices/device/4bc6a41b-054e-4448-be23-29676936ad1d/capability/onoff`;
 
     // Bygg forespørselens body
     const body = {
@@ -25,9 +25,9 @@ export const toggleTV = async (action) => {
     };
 
     try {
-        // Send POST-forespørsel til Homey API
+        // Send PUT-forespørsel til Homey API
         const response = await fetch(url, {
-            method: 'PUT', // Homey bruker ofte PUT for å oppdatere tilstand
+            method: 'PUT', // Homey bruker PUT for å oppdatere tilstand
             headers,
             body: JSON.stringify(body),
         });
