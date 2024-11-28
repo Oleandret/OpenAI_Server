@@ -1,28 +1,48 @@
-import axios from 'axios';
+import fetch from 'node-fetch';
 
-const toggleTvPower = async (action) => {
-  try {
-    const homeyApiUrl = 'https://cloud.homey.app/api/manager/devices/device/60d9c2cd16a1ad8d0cc6d8d-1690946168744/capability/onoff';
-    const apiToken = 'Bearer a24e0754-a95f-43b1-be67-011fec659b99:a024ccbc-4e0f-4918-a5e7-1790411c5e15:8b4c68839f4ec900821e23f3f16f9e767533fa84';
+// Funksjon for å slå av eller på TV-en via Homey API
+export const toggleTV = async (action) => {
+    // Hent API-nøkkelen fra miljøvariabelen
+    const homeyApiKey = process.env.HOMEY_API_KEY;
 
-    const response = await axios({
-      method: 'PUT', // For å oppdatere en egenskap
-      url: homeyApiUrl,
-      headers: {
-        Authorization: apiToken,
+    if (!homeyApiKey) {
+        console.error("Homey API-nøkkel mangler!");
+        throw new Error("Homey API-nøkkel mangler.");
+    }
+
+    // URL til Homey API for TV-en
+    const url = `https://api.homey.app/manager/devices/device/6d9c2cd1f6a1ad8d0cc6d8d-1690946168744/capability/onoff`;
+
+    // Bygg forespørselens body
+    const body = {
+        value: action === "on" ? true : false, // Sett true for "on" og false for "off"
+    };
+
+    // Sett opp headers med autorisasjon og JSON-innhold
+    const headers = {
+        Authorization: `Bearer ${homeyApiKey}`,
         'Content-Type': 'application/json',
-      },
-      data: {
-        value: action === 'on', // true for på, false for av
-      },
-    });
+    };
 
-    console.log(`TV ${action === 'on' ? 'slått på' : 'slått av'}:`, response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Feil under kommunikasjon med Homey API:', error.response?.data || error.message);
-    throw new Error('Kunne ikke kontrollere TV-en.');
-  }
+    try {
+        // Send POST-forespørsel til Homey API
+        const response = await fetch(url, {
+            method: 'PUT', // Homey bruker ofte PUT for å oppdatere tilstand
+            headers,
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            // Håndter feil fra API-et
+            const error = await response.text();
+            console.error("Feil ved kall til Homey API:", error);
+            throw new Error(error);
+        }
+
+        // Returner resultatet fra API-et
+        return await response.json();
+    } catch (error) {
+        console.error("Feil under forespørsel:", error.message);
+        throw new Error("Kunne ikke koble til Homey API.");
+    }
 };
-
-export default toggleTvPower;
