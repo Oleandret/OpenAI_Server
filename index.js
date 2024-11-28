@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import chatRoutes from './routes/chat.js'; // Default import
+import fs from 'fs'; // File system for dynamisk innlasting av ruter
+import path from 'path'; // For å håndtere filbaner
 
 dotenv.config();
 
@@ -32,8 +33,18 @@ app.get('/', (req, res) => {
     res.json({ status: 'Server is running' });
 });
 
-// Bruk rutene fra chat.js
-app.use('/v1', chatRoutes);
+// Dynamisk innlasting av rutefiler
+const routesPath = path.join(path.resolve(), 'routes');
+fs.readdirSync(routesPath).forEach((file) => {
+    if (file.endsWith('.js')) {
+        const route = `./routes/${file}`;
+        import(route).then((module) => {
+            const routeName = `/${file.replace('.js', '')}`;
+            console.log(`Laster inn rute: ${routeName}`);
+            app.use(routeName, module.default);
+        });
+    }
+});
 
 // Start serveren
 app.listen(port, () => {
